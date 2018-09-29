@@ -2,8 +2,11 @@ package com.techmojo.hackathon.getbetter.controller;
 
 import java.util.ArrayList;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techmojo.hackathon.getbetter.model.SearchFilterType;
@@ -46,4 +49,31 @@ public class AppraisalController {
 
 		return filterDetails;
 	}
+	
+	@GetMapping("appraisals/search")
+	public void getAppraisals() {
+		
+	}
+
+	@PostMapping("appraisals/")
+	public void addAppraisal() {
+		
+	}
+	
+	@GetMapping("appraisals/{appraisal-id}")
+	public void modifyAppraisal(@PathVariable("appraisal-id") int appraisalId) {
+		
+	}
+
+	@PutMapping("appraisals/{appraisal-id}")
+	public void getAppraisal(@PathVariable("appraisal-id") int appraisalId) {
+		
+	}
+	
+	@DeleteMapping("appraisals/{appraisal-id}")
+	public void deleteAppraisal(@PathVariable("appraisal-id") int appraisalId) {
+		
+	}
+	
+	
 }
