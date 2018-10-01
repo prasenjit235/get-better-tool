@@ -68,8 +68,17 @@ public class BackofficeService {
 	}
 
 	public Parameter getParameter(int categoryId, int paramterId) {
-		dao.getParameter(categoryId, paramterId);
-		return null;
+		return dao.getParameter(categoryId, paramterId);
+	}
+
+	@Transactional
+	public int deleteParameter(int categoryId, int parameterId) {
+		int deleted = 0;
+		// remove weightages for the parameter
+		dao.deleteWeightage(parameterId);
+		// remove parameter
+		deleted = dao.deleteParameter(parameterId);
+		return deleted;
 	}
 	
 }

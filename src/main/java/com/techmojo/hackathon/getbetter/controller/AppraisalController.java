@@ -2,18 +2,28 @@ package com.techmojo.hackathon.getbetter.controller;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.techmojo.hackathon.getbetter.model.Appraisal;
 import com.techmojo.hackathon.getbetter.model.SearchFilterType;
 import com.techmojo.hackathon.getbetter.model.SearchTypeDetail;
+import com.techmojo.hackathon.getbetter.services.AppraisalService;
 
 @RestController
 public class AppraisalController {
+	
+	@Autowired
+	private AppraisalService service;
 
 	@GetMapping("appraisal/search/filter/types")
 	public ArrayList<SearchFilterType> getSearchFilterTypes() {
@@ -52,22 +62,60 @@ public class AppraisalController {
 	
 	@GetMapping("appraisals/search")
 	public void getAppraisals() {
-		
+		/**
+		 * @todo
+		 */
 	}
 
 	@PostMapping("appraisals/")
-	public void addAppraisal() {
+	public ResponseEntity<Appraisal> addAppraisal(@RequestBody Appraisal appraisal) {
+		HttpStatus status = HttpStatus.CREATED;
+		Appraisal createdAppraisal = null;
+		try {
+			createdAppraisal = service.addAppraisal(appraisal);
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<Appraisal>(createdAppraisal,status);
+	}
+	
+	@GetMapping("appraisals/employees/{employee-id}")
+	public void getAppraisalForEmployee(@PathVariable("employee-id") int employeeId) {
+		
+	}
+	
+	@GetMapping("appraisals/employees/{employee-id}/reportees")
+	public void getAppraisalForEmployeeReportees(@PathVariable("employee-id") int employeeId) {
 		
 	}
 	
 	@GetMapping("appraisals/{appraisal-id}")
-	public void modifyAppraisal(@PathVariable("appraisal-id") int appraisalId) {
-		
+	public ResponseEntity<Appraisal> getAppraisal(@PathVariable("appraisal-id") int appraisalId) {
+		Appraisal appraisal = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			appraisal = service.getAppraisal(appraisalId);
+			if (appraisal == null) {
+				status = HttpStatus.NOT_FOUND;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<Appraisal>(appraisal,status);
 	}
 
 	@PutMapping("appraisals/{appraisal-id}")
-	public void getAppraisal(@PathVariable("appraisal-id") int appraisalId) {
-		
+	public ResponseEntity<Appraisal> modifyAppraisal(@PathVariable("appraisal-id") int appraisalId, @RequestBody Appraisal appraisal) {
+		HttpStatus status = HttpStatus.OK;
+		try {
+			service.modifyAppraisal(appraisalId, appraisal);
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<Appraisal>(status);
 	}
 	
 	@DeleteMapping("appraisals/{appraisal-id}")

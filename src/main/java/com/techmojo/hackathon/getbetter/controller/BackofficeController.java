@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,6 +75,7 @@ public class BackofficeController {
 	@PutMapping("backoffice/appraisal/categories/{category-id}/parameters/{paramter-id}")
 	public ResponseEntity<Parameter> modifyParameter(@PathVariable("category-id") int categoryId,
 			@PathVariable("paramter-id") int paramterId, @RequestBody Parameter parameter) {
+		// @todo : insert weightage for an existing parameter
 		HttpStatus status = HttpStatus.OK;
 		int modified = 0;
 		try {
@@ -89,8 +91,19 @@ public class BackofficeController {
 	}
 
 	@DeleteMapping("backoffice/appraisal/categories/{category-id}/parameters/{paramter-id}")
-	public void deleteParameter(@PathVariable("category-id") int categoryId,
+	public ResponseEntity<Parameter> deleteParameter(@PathVariable("category-id") int categoryId,
 			@PathVariable("paramter-id") int paramterId) {
-
+		HttpStatus status = HttpStatus.OK;
+		int modified = 0;
+		try {
+			modified = service.deleteParameter(categoryId, paramterId);
+			if (modified == 0) {
+				status = HttpStatus.NOT_FOUND;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<Parameter>(status);
 	}
 }

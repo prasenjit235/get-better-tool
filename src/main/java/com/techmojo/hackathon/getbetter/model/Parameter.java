@@ -12,6 +12,10 @@ public class Parameter {
 	private int status;
 	private List<Weightage> weightages;
 
+	public Parameter() {
+
+	}
+	
 	public Parameter(int parameterId, String parameterName, int categoryId, Date creationDate, int status) {
 		super();
 		this.parameterId = parameterId;

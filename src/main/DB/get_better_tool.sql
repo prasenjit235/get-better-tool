@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `tbl_Appraisals` (
   `iAppraisalID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `iFrom` int(11) NOT NULL,
   `iTo` int(11) NOT NULL,
-  `iConversationID` int(11) NOT NULL,
+  `iConversationID` varchar(32),
   `dtCReatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `iStatus` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`iAppraisalID`)
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `tbl_Appraisal_Details` (
   `iAppraisalID` int(11) NOT NULL,
   `iWeigtageID` int(11) NOT NULL,
   `iScore` int(11) NOT NULL,
-  `iConversationID` int(11) NOT NULL,
+  `iConversationID` varchar(32),
   `dtCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`iSno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -82,11 +82,11 @@ INSERT INTO `tbl_Categories` (`iCategoryID`, `cCategoryName`, `dtCreatedOn`, `dt
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_Conversations` (
-  `iConversationID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `iConversationID` varchar(32) NOT NULL,
   `tConversation` tinytext NOT NULL,
   `dtCreatedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`iConversationID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  `iCreatedBy` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 

@@ -6,6 +6,10 @@ public class Weightage {
 	private int weightage;
 	private int designationId;
 	private int status;
+	
+	public Weightage() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public Weightage(int weightageId, int weightage, int designationId, int status) {
 		super();
