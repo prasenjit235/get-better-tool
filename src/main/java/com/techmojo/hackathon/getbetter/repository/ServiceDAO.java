@@ -32,7 +32,9 @@ public class ServiceDAO {
 		if (details == null || details.isEmpty()) {
 			return null;
 		}
-		
+		for (Category category : details) {
+			category.setParameters(getParameters(category.getId()));
+		}
 		return details;
 	}
 	
@@ -43,7 +45,7 @@ public class ServiceDAO {
 		if (details == null || details.isEmpty()) {
 			return null;
 		}
-		
+		details.get(0).setParameters(getParameters(category));
 		return details.get(0);
 	}
 	

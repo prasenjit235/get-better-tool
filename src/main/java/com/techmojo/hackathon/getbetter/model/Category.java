@@ -1,6 +1,7 @@
 package com.techmojo.hackathon.getbetter.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Category {
 
@@ -9,6 +10,7 @@ public class Category {
 	private Date creationDate;
 	private Date updationDate;
 	private int status;
+	private List<Parameter> parameters;
 
 	public Category() {
 		super();
@@ -61,6 +63,14 @@ public class Category {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public List<Parameter> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(List<Parameter> parameters) {
+		this.parameters = parameters;
 	}
 
 }
