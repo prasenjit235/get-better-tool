@@ -132,6 +132,7 @@ public class ServiceDAO {
 						+ " p.cParameterName,"
 						+ " p.dtCreatedOn as p_createdDate,"
 						+ " p.iStatus as p_status,"
+						+ " p.iCategoryID,"
 						+ " w.iWeightageID,"
 						+ " w.iDesignationID,"
 						+ " w.iScore,"
@@ -285,6 +286,43 @@ public class ServiceDAO {
 					 + " a.iTo = ?"
 					 + " and a.iYear = ?"
 					 + " and a.iMonth = ?";
+				break;
+			case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH":
+				query = "select "
+						+ " a.iFrom,"
+						+ " a.iTo,"
+						+ " a.iConversationID,"
+						+ " a.dtCreatedOn,"
+						+ " a.iAppraisalID,"
+						+ " a.iStatus,"
+						+ " a.iYear,"
+						+ " a.iMonth,"
+						+ " c.tConversation,"
+						+ " c.iCreatedBy "
+					 + "from tbl_Appraisals a left join tbl_Conversations c "
+					 + " on a.iConversationID = c.iConversationID "
+					 + "where "
+					 + " a.iFrom = ?"
+					 + " and a.iYear = ?"
+					 + " and a.iMonth = ?";
+				break;
+			case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL":
+				query = "select "
+						+ " a.iFrom,"
+						+ " a.iTo,"
+						+ " a.iConversationID,"
+						+ " a.dtCreatedOn,"
+						+ " a.iAppraisalID,"
+						+ " a.iStatus,"
+						+ " a.iYear,"
+						+ " a.iMonth,"
+						+ " c.tConversation,"
+						+ " c.iCreatedBy "
+					 + "from tbl_Appraisals a left join tbl_Conversations c "
+					 + " on a.iConversationID = c.iConversationID "
+					 + "where "
+					 + " a.iFrom = ?"
+					 + " and a.iYear = ?";
 				break;
 			default:
 				break;
@@ -477,16 +515,28 @@ public class ServiceDAO {
 		return appraisal;
 	}
 
-	public ArrayList<Appraisal> getAppraisalForEmployee(int employeeId, int year, int month) {
+	public ArrayList<Appraisal> getAppraisalForEmployee(int employeeId, int year, int month, boolean fromEmpl) {
 		AppraisalMapper mapper= new AppraisalMapper();
-		if (month > 0) {
-			jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH"), 
-					new Object[] {employeeId, year, month}, 
-					mapper);
+		if (fromEmpl) {
+			if (month > 0) {
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH"), 
+						new Object[] {employeeId, year, month}, 
+						mapper);
+			} else {
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL"), 
+						new Object[] {employeeId, year}, 
+						mapper);
+			}
 		} else {
-			jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL"), 
-					new Object[] {employeeId, year}, 
-					mapper);
+			if (month > 0) {
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH"), 
+						new Object[] {employeeId, year, month}, 
+						mapper);
+			} else {
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL"), 
+						new Object[] {employeeId, year}, 
+						mapper);
+			}
 		}
 		
 		ArrayList<Appraisal> appraisals = mapper.getAppraisals();

@@ -121,7 +121,18 @@ public class AppraisalService {
 			year = cal.get(Calendar.YEAR);
 		}
 		
-		return dao.getAppraisalForEmployee(employeeId, year, month);
+		return dao.getAppraisalForEmployee(employeeId, year, month, true);
+	}
+
+	public ArrayList<Appraisal> getAppraisalForEmployeeReportees(int employeeId, int year, int month) {
+		// validate year , for now default
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.setTime(new Date());
+		if (year == 0) {
+			year = cal.get(Calendar.YEAR);
+		}
+		
+		return dao.getAppraisalForEmployee(employeeId, year, month, false);
 	}
 	
 

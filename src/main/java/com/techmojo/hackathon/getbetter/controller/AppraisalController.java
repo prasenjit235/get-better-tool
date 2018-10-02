@@ -99,9 +99,20 @@ public class AppraisalController {
 	}
 	
 	@GetMapping("appraisals/employees/{employee-id}/reportees")
-	public void getAppraisalForEmployeeReportees(@PathVariable("employee-id") int employeeId,
+	public ResponseEntity<ArrayList<Appraisal>> getAppraisalForEmployeeReportees(@PathVariable("employee-id") int employeeId,
 			@RequestParam("financial-year") int year, @RequestParam("month") int month) {
-		
+		ArrayList<Appraisal> appraisals = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			appraisals = service.getAppraisalForEmployeeReportees(employeeId, year, month);
+			if (appraisals == null || appraisals.isEmpty()) {
+				status = HttpStatus.NOT_FOUND;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<ArrayList<Appraisal>>(appraisals,status);
 	}
 	
 	@GetMapping("appraisals/{appraisal-id}")
