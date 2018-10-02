@@ -27,7 +27,7 @@ public class ParameterMapper implements RowCallbackHandler{
 			parameter = new Parameter(
 					rs.getInt("iParameterID"), 
 					rs.getString("cParameterName"), 
-					0, 
+					rs.getInt("iCategoryID"), 
 					rs.getDate("p_createdDate"),
 					rs.getInt("p_status"));
 			parameter.setWeightages(new ArrayList<Weightage>());

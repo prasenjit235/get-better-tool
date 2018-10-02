@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techmojo.hackathon.getbetter.model.Appraisal;
@@ -81,12 +82,25 @@ public class AppraisalController {
 	}
 	
 	@GetMapping("appraisals/employees/{employee-id}")
-	public void getAppraisalForEmployee(@PathVariable("employee-id") int employeeId) {
-		
+	public ResponseEntity<ArrayList<Appraisal>> getAppraisalForEmployee(@PathVariable("employee-id") int employeeId, 
+			@RequestParam("financial-year") int year, @RequestParam("month") int month) {
+		ArrayList<Appraisal> appraisals = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			appraisals = service.getAppraisalForEmployee(employeeId, year, month);
+			if (appraisals == null || appraisals.isEmpty()) {
+				status = HttpStatus.NOT_FOUND;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			e.printStackTrace();
+		}
+		return new ResponseEntity<ArrayList<Appraisal>>(appraisals,status);
 	}
 	
 	@GetMapping("appraisals/employees/{employee-id}/reportees")
-	public void getAppraisalForEmployeeReportees(@PathVariable("employee-id") int employeeId) {
+	public void getAppraisalForEmployeeReportees(@PathVariable("employee-id") int employeeId,
+			@RequestParam("financial-year") int year, @RequestParam("month") int month) {
 		
 	}
 	

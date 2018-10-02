@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +148,7 @@ public class ServiceDAO {
 						+ " p.cParameterName,"
 						+ " p.dtCreatedOn as p_createdDate,"
 						+ " p.iStatus as p_status,"
+						+ " p.iCategoryID,"
 						+ " w.iWeightageID,"
 						+ " w.iDesignationID,"
 						+ " w.iScore,"
@@ -183,8 +185,10 @@ public class ServiceDAO {
 								+ " iFrom,"
 								+ " iTo,"
 								+ " iConversationID,"
-								+ " iStatus) "
-								+ " values(?,?,?,?)";
+								+ " iStatus,"
+								+ " iYear,"
+								+ " iMonth) "
+								+ " values(?,?,?,?,?,?)";
 				break;
 			case "INSERT_APPRAISAL_DETAILS":
 				query = "insert "
@@ -222,6 +226,8 @@ public class ServiceDAO {
 						+ " a.dtCreatedOn,"
 						+ " a.iAppraisalID,"
 						+ " a.iStatus,"
+						+ " a.iYear,"
+						+ " a.iMonth,"
 						+ " c.tConversation,"
 						+ " c.iCreatedBy "
 					 + "from tbl_Appraisals a left join tbl_Conversations c "
@@ -235,11 +241,51 @@ public class ServiceDAO {
 						+ " d.iScore,"
 						+ " d.iConversationID,"
 						+ " d.dtCreatedOn,"
+						+ " w.iParameterID,"
 						+ " c.tConversation,"
 						+ " c.iCreatedBy "
-					 + "from tbl_Appraisal_Details d left join tbl_Conversations c "
+					 + "from tbl_Appraisal_Details d inner join tbl_Weigtages w "
+					 + " on w.iWeightageID = d.iWeigtageID left join tbl_Conversations c "
 					 + " on d.iConversationID = c.iConversationID "
 					 + "where d.iAppraisalID = ?";
+				break;
+			case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL":
+				query = "select "
+						+ " a.iFrom,"
+						+ " a.iTo,"
+						+ " a.iConversationID,"
+						+ " a.dtCreatedOn,"
+						+ " a.iAppraisalID,"
+						+ " a.iStatus,"
+						+ " a.iYear,"
+						+ " a.iMonth,"
+						+ " c.tConversation,"
+						+ " c.iCreatedBy "
+					 + "from tbl_Appraisals a left join tbl_Conversations c "
+					 + " on a.iConversationID = c.iConversationID "
+					 + "where "
+					 + " a.iTo = ?"
+					 + " and a.iYear = ?";
+				break;
+			case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH":
+				query = "select "
+						+ " a.iFrom,"
+						+ " a.iTo,"
+						+ " a.iConversationID,"
+						+ " a.dtCreatedOn,"
+						+ " a.iAppraisalID,"
+						+ " a.iStatus,"
+						+ " a.iYear,"
+						+ " a.iMonth,"
+						+ " c.tConversation,"
+						+ " c.iCreatedBy "
+					 + "from tbl_Appraisals a left join tbl_Conversations c "
+					 + " on a.iConversationID = c.iConversationID "
+					 + "where "
+					 + " a.iTo = ?"
+					 + " and a.iYear = ?"
+					 + " and a.iMonth = ?";
+				break;
 			default:
 				break;
 		}
@@ -336,7 +382,7 @@ public class ServiceDAO {
 		return count;
 	}
 
-	public int addAppraisal(int from, int to, String conversationId, int status) {
+	public int addAppraisal(int from, int to, String conversationId, int status, int year, int month) {
 		KeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
@@ -346,6 +392,8 @@ public class ServiceDAO {
 				ps.setInt(2, to);
 				ps.setString(3, conversationId);
 				ps.setInt(4, status);
+				ps.setInt(5, year);
+				ps.setInt(6, month);
 				return ps;
 			}
 		}, holder);
@@ -422,7 +470,40 @@ public class ServiceDAO {
 				new Object[] {appraisalId}, 
 				dtlsmapper);
 		List<AppraisalDetail> appraisals = dtlsmapper.getAppraisalDetails();
+		for (AppraisalDetail appraisalDetail : appraisals) {
+			appraisalDetail.setParameter(getParameter(0, appraisalDetail.getParameter().getParameterId()));
+		}
 		appraisal.setAppraisalDetails(appraisals);
 		return appraisal;
+	}
+
+	public ArrayList<Appraisal> getAppraisalForEmployee(int employeeId, int year, int month) {
+		AppraisalMapper mapper= new AppraisalMapper();
+		if (month > 0) {
+			jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH"), 
+					new Object[] {employeeId, year, month}, 
+					mapper);
+		} else {
+			jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL"), 
+					new Object[] {employeeId, year}, 
+					mapper);
+		}
+		
+		ArrayList<Appraisal> appraisals = mapper.getAppraisals();
+		if (appraisals == null) {
+			return null;
+		}
+		for (Appraisal appraisal : appraisals) {
+			AppraisalDetailsMapper dtlsmapper= new AppraisalDetailsMapper();
+			jdbcTemplate.query(getQueries("GET_APPRAISAL_DTLS"), 
+					new Object[] {appraisal.getAppraisalId()}, 
+					dtlsmapper);
+			List<AppraisalDetail> appraisalDtls = dtlsmapper.getAppraisalDetails();
+			for (AppraisalDetail appraisalDetail : appraisalDtls) {
+				appraisalDetail.setParameter(getParameter(0, appraisalDetail.getParameter().getParameterId()));
+			}
+			appraisal.setAppraisalDetails(appraisalDtls);
+		}
+		return appraisals;
 	}
 }
