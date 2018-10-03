@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
 
+  title: string = 'Get Better Tool';
   constructor() { }
 
   ngOnInit() {

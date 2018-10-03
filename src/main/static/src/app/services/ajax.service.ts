@@ -10,12 +10,9 @@ import { catchError } from 'rxjs/operators';
 })
 export class AjaxService {
 
-  routesArray = [];
   constructor(
     private http:Http
-  ) {
-    this.routesArray = ['addchildcare','addchildcareaddress','getsubscriptions','addsubscription','addchildcareadmin','authenticate'];
-  }
+  ) { }
 
   doPost(url,params): Promise<String>{
     return new Promise((resolve,reject)=>{
@@ -24,11 +21,15 @@ export class AjaxService {
       let headers = new Headers();
       headers.set('Content-Type','application/json');
 
-      this.http.post(environment.apiUrl+url,params,{headers:headers})
+      this.http.post(environment.host+url,params,{headers:headers})
       .toPromise().then(
           data => {
-            let response = JSON.parse(data["_body"]);
-            resolve(response);
+            if(data['status'] === 201) {
+              let response = JSON.parse(data["_body"]);
+              resolve (response);
+            }else{
+              reject(data);
+            }
           }
         ).catch(e =>{
           console.log(e);
@@ -42,14 +43,18 @@ export class AjaxService {
         let headers = new Headers();
         headers.set('Content-Type','application/json');
 
-        this.http.get(environment.apiUrl+url,{search:params,headers:headers})
+        this.http.get(environment.host+url,{search:params,headers:headers})
         .toPromise().then(
             data => {
-              let response = JSON.parse(data["_body"]);
-              resolve (response);
+              if(data['status'] === 200) {
+                let response = JSON.parse(data["_body"]);
+                resolve (response);
+              }else{
+                reject(data);
+              }
             }
           ).catch(e =>{
-            console.log(e);
+            console.log("error",e);
           });
       });
   }
@@ -61,11 +66,15 @@ export class AjaxService {
       let headers = new Headers();
       headers.set('Content-Type','application/json');
 
-      this.http.put(environment.apiUrl+url,params,{headers:headers})
+      this.http.put(environment.host+url,params,{headers:headers})
       .toPromise().then(
           data => {
-            let response = JSON.parse(data["_body"]);
-            resolve(response);
+            if(data['status'] === 200) {
+              let response = JSON.parse(data["_body"]);
+              resolve (response);
+            }else{
+              reject(data);
+            }
           }
         ).catch(e =>{
           console.log(e);
@@ -80,10 +89,14 @@ export class AjaxService {
       let headers = new Headers();
       headers.set('Content-Type','application/json');
 
-      this.http.delete(environment.apiUrl+url,{headers:headers})
+      this.http.delete(environment.host+url,{headers:headers})
       .toPromise().then(
           data => {
-            console.log(data);
+            if(data['status'] === 200) {
+              resolve (data['statusText']);
+            }else{
+              reject(data);
+            }
           }
         ).catch(e =>{
           console.log(e);
@@ -91,20 +104,29 @@ export class AjaxService {
       });
   }
 
+  userLogin(data): Promise<String>{
+    return this.doPost('login',data);
+  }
+
   getCategories(): Promise<String>{
-    return this.doGet('categories',"");
+    return this.doGet('backoffice/appraisal/categories',"");
   }
 
   addParameter(data,catId): Promise<String>{
-    return this.doPost('categories/'+catId+'/parameters',data);
+    return this.doPost('backoffice/appraisal/categories/'+catId+'/parameters',data);
   }
 
   updateParameter(data,catId,paramId): Promise<String>{
-    return this.doPut('categories/'+catId+'/parameters/'+paramId,data);
+    return this.doPut('backoffice/appraisal/categories/'+catId+'/parameters/'+paramId,data);
   }
 
   deleteParameter(catId,paramId): Promise<String>{
-    return this.doDelete('categories/'+catId+'/parameters/'+paramId);
+    return this.doDelete('backoffice/appraisal/categories/'+catId+'/parameters/'+paramId);
+  }
+
+  serachAppraisals(empId,data): Promise<String>{
+    let queryData = this.getSearchParams(data);
+    return this.doGet('appraisals/employees/'+empId,queryData);
   }
 
   getSearchParams(searchData){

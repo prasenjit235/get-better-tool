@@ -25,10 +25,10 @@
     <!-- /.search form -->
     <!-- sidebar menu: : style can be found in sidebar.less -->
     <ul class="sidebar-menu" data-widget="tree">
-      <li class="header">MAIN NAVIGATION</li>
-      <li class="treeview">
-        <a routerLink = "/content/dashboard">
-          <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+      <!-- <li class="header">MAIN NAVIGATION</li> -->
+      <li [class.active] = "activeTab == 'appraisal'" (click)="getActiveTab('appraisal')">
+        <a [routerLink]="'appraisal'">
+          <i class="fa fa-dashboard"></i> <span>Appraisal</span>
           <!-- <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
           </span> -->
@@ -53,8 +53,8 @@
           <li><a href="../layout/collapsed-sidebar.html"><i class="fa fa-circle-o"></i> Collapsed Sidebar</a></li>
         </ul>
       </li> -->
-      <li>
-        <a routerLink = "/content/parameters">
+      <li [class.active] = "activeTab == 'parameters'" (click)="getActiveTab('parameters')">
+        <a [routerLink]="'parameters'">
           <i class="fa fa-th"></i> <span>Parameters</span>
         </a>
       </li>

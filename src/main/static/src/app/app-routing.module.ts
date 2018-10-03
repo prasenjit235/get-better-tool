@@ -4,13 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ContentComponent } from './content/content.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { AppraisalComponent } from './appraisal/appraisal.component';
 import { ParametersComponent } from './parameters/parameters.component';
 
 const routes: Routes = [
   {
       path: '',
-      redirectTo: '/content',
+      redirectTo: '/login',
       pathMatch: 'full'
   },
   {
@@ -25,9 +25,9 @@ const routes: Routes = [
       path: 'content',
       component: ContentComponent,
       children: [
-          { path: 'dashboard', component: DashboardComponent },
+          { path: 'appraisal', component: AppraisalComponent },
           { path: 'parameters', component: ParametersComponent },
-          { path: '**', redirectTo: '/content/dashboard', pathMatch: 'full' }
+          { path: '**', redirectTo: '/content/appraisal', pathMatch: 'full' }
       ]
   },
 ];

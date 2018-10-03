@@ -15,26 +15,7 @@ export class ParametersComponent implements OnInit {
   showNew: Boolean = false;
   submitType: string = 'Save';
   title: string = 'Create Parameters';
-  config = [
-    {
-      type: 'input',
-      label: 'Full name',
-      name: 'name',
-      placeholder: 'Enter your name',
-    },
-    {
-      type: 'select',
-      label: 'Favourite food',
-      name: 'food',
-      options: ['Pizza', 'Hot Dogs', 'Knakworstje', 'Coffee'],
-      placeholder: 'Select an option',
-    },
-    {
-      label: 'Submit',
-      name: 'submit',
-      type: 'button',
-    },
-  ];
+  editableData: any;
 
   constructor(
     private ajaxService: AjaxService,
@@ -83,19 +64,26 @@ export class ParametersComponent implements OnInit {
               categoryName: data[i]['name'],
               parameterId: data[i]['parameters'][j]['parameterId'],
               parameterName: data[i]['parameters'][j]['parameterName'],
+              seWeightageId: '',
               seWeightage: '',
+              sseWeightageId: '',
               sseWeightage: '',
+              taWeightageId: '',
               taWeightage: ''
             };
             for(let k = 0; k < data[i]['parameters'][j]['weightages'].length; k++){
               let score = data[i]['parameters'][j]['weightages'][k]['weightage'];
+              let weightage = data[i]['parameters'][j]['weightages'][k]['weightageId'];
 
               if(data[i]['parameters'][j]['weightages'][k]['designationId'] === 1){
                 jsonData['seWeightage'] = score;
+                jsonData['seWeightageId'] = weightage;
               }else if(data[i]['parameters'][j]['weightages'][k]['designationId'] === 2){
                 jsonData['sseWeightage'] = score;
+                jsonData['sseWeightageId'] = weightage;
               }else{
                 jsonData['taWeightage'] = score;
+                jsonData['taWeightageId'] = weightage;
               }
             }
             paramsArray.push(jsonData);
@@ -114,130 +102,83 @@ export class ParametersComponent implements OnInit {
           "parameterName": this.parametersForm.controls["parameterName"].value,
           "categoryId" : catId,
           "status" : 1,
-          "weightages" : [
-                  {
-                      "weightage" : this.parametersForm.controls["se_weightage"].value,
-                      "designationId" : 1,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["sse_weightage"].value,
-                      "designationId" : 2,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 3,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 4,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 5,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 6,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 7,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 8,
-                      "status" : 1
-                  }
-                ]
+          "weightages" : this.getWeigtagesData()
         };
 
-        this.ajaxService.addParameter(formData,catId)
-            .then(data => {
-              this.getCategories();
-            });
+        if(this.submitType === 'Update' && this.editableData){
+          let catId = this.editableData.categoryId;
+          let paramId = this.editableData.parameterId;
+          formData['parameterId'] = paramId;
+          this.ajaxService.updateParameter(formData,catId,paramId)
+              .then(data => {
+                this.editableData = null;
+                this.showNew = false;
+                this.getCategories();
+              });
+        }else{
+          this.ajaxService.addParameter(formData,catId)
+              .then(data => {
+                this.showNew = false;
+                this.getCategories();
+              });
+        }
     }
   }
 
   updateParam(data):void {
+    this.editableData = data;
     this.showNew = true;
     this.submitType = 'Update';
+    this.title = 'Update Parameters';
     this.parametersForm.controls['categoryId'].setValue(data.categoryId);
     this.parametersForm.controls['parameterName'].setValue(data.parameterName);
     this.parametersForm.controls['se_weightage'].setValue(data.seWeightage);
     this.parametersForm.controls['sse_weightage'].setValue(data.sseWeightage);
     this.parametersForm.controls['ta_weightage'].setValue(data.taWeightage);
-
-    if(this.parametersForm.valid){
-        let catId = this.parametersForm.controls["categoryId"].value;
-
-        let formData = {
-          "parameterName": this.parametersForm.controls["parameterName"].value,
-          "categoryId" : catId,
-          "status" : 1,
-          "weightages" : [
-                  {
-                      "weightage" : this.parametersForm.controls["se_weightage"].value,
-                      "designationId" : 1,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["sse_weightage"].value,
-                      "designationId" : 2,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 3,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 4,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 5,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 6,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 7,
-                      "status" : 1
-                  },
-                  {
-                      "weightage" : this.parametersForm.controls["ta_weightage"].value,
-                      "designationId" : 8,
-                      "status" : 1
-                  }
-                ]
-        };
-
-        this.ajaxService.updateParameter(formData,catId,data.parameterId)
-            .then(data => {
-              this.showNew = false;
-              this.getCategories();
-            });
-      }
   }
 
   deleteParam(data):void {
     this.ajaxService.deleteParameter(data.categoryId,data.parameterId)
         .then(data => {
-          this.getCategories();
+          if(data === "OK"){
+            this.getCategories();
+          }
         });
   }
 
+  getWeigtagesData() {
+    let data = [];
+    for(let i = 1; i < 9; i++){
+      let obj = {};
+      switch(i){
+        case 1:
+          obj['weightage'] = this.parametersForm.controls["se_weightage"].value;
+          obj['designationId'] = i;
+          obj['status'] = 1;
+          if(this.editableData){
+            obj['weightageId'] = this.editableData['seWeightageId'];
+          }
+          break;
+        case 2:
+          obj['weightage'] = this.parametersForm.controls["sse_weightage"].value;
+          obj['designationId'] = i;
+          obj['status'] = 1;
+          if(this.editableData){
+            obj['weightageId'] = this.editableData['sseWeightageId'];
+          }
+          break;
+        default:
+          obj['weightage'] = this.parametersForm.controls["ta_weightage"].value;
+          obj['designationId'] = i;
+          obj['status'] = 1;
+          if(this.editableData){
+            obj['weightageId'] = this.editableData['taWeightageId'];
+          }
+          break;
+      }
+      data.push(obj);
+    }
+
+    return data;
+  }
 }

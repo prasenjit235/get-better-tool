@@ -6,19 +6,19 @@
   <div class="login-box-body">
     <p class="login-box-msg">Sign in to start your session</p>
 
-    <form method="post">
+    <form [formGroup]="loginForm" (submit)="login()">
       <div class="form-group has-feedback">
-        <input type="email" class="form-control" placeholder="Email">
+        <input type="text" formControlName="empId" id="empId" class="form-control" placeholder="Emp Id">
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" placeholder="Password">
+        <input type="password" formControlName="pwd" id="pwd" class="form-control" placeholder="Password">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       <div class="row">
         <!-- /.col -->
         <div class="col-xs-4">
-          <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+          <button type="submit" class="btn btn-primary btn-block btn-flat" [disabled]="!loginForm.valid">Sign In</button>
         </div>
         <div class="col-xs-8">
           <a routerLink="/forgotPassword" class="right">I forgot my password</a>
