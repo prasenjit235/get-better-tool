@@ -8,3 +8,20 @@
 /* Optionally, add other skins you may use...
 @import "../node_modules/admin-lte/dist/css/skins/skin-black.css";
 */
+
+.box-header{
+    padding: 20px;
+}
+
+.box-header > .box-tools{
+    top: 13px;
+}
+
+.circle-label{
+    border: 1px solid red;
+    border-radius: 51%;
+    width: 3.5%;
+    padding: 6px 11px 0;
+    background: brown;
+    color: #ffffff;
+}
