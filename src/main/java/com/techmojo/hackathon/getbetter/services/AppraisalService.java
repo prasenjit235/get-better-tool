@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,9 @@ import com.mysql.jdbc.StringUtils;
 import com.techmojo.hackathon.getbetter.model.Appraisal;
 import com.techmojo.hackathon.getbetter.model.AppraisalDetail;
 import com.techmojo.hackathon.getbetter.model.Conversation;
+import com.techmojo.hackathon.getbetter.model.IndividualReport;
+import com.techmojo.hackathon.getbetter.model.SearchData;
+import com.techmojo.hackathon.getbetter.model.Weightage;
 import com.techmojo.hackathon.getbetter.repository.ServiceDAO;
 
 @Component
@@ -135,5 +139,53 @@ public class AppraisalService {
 		return dao.getAppraisalForEmployee(employeeId, year, month, false);
 	}
 	
+	public SearchData searchTerm(String type,int typeId, int year, int month) {
+		SearchData data = null;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.setTime(new Date());
+		if (year == 0) {
+			year = cal.get(Calendar.YEAR);
+		}
+		if (type.equalsIgnoreCase("team")) {
+			/**
+			 * 
+			 */
+		} else if (type.equalsIgnoreCase("employee")) {
+			List<IndividualReport> individualReports = dao.getIndividualRatings(typeId, year, month);
+			HashMap<Integer, Weightage>  weightages = dao.getWeightagesForIndividual(typeId);
+			double totalRating = calculateTotalRating(weightages);
+			HashMap<Integer, IndividualReport> monthlyRating = new HashMap<>();
+			int locRating;
+			
+			for (IndividualReport individualReport : individualReports) {
+				if (!monthlyRating.containsKey(individualReport.getMonth())) {
+					monthlyRating.put(individualReport.getMonth(), individualReport);
+				}
+				int weightage = 0;
+				if (weightages.containsKey(individualReport.getWeightageId())) {
+					weightage = weightages.get(individualReport.getWeightageId()).getWeightage();
+				}
+				
+				locRating = individualReport.getScore()*weightage;
+				IndividualReport report = monthlyRating.get(individualReport.getMonth());
+				report.setRating(report.getRating()+locRating);
+			}
+			List<IndividualReport> reports = new ArrayList<IndividualReport>(monthlyRating.values());
+			for (IndividualReport individualReport : reports) {
+				individualReport.setRating((individualReport.getRating()/totalRating)*100);
+			}
+			data = new SearchData();
+			data.setIndividualReports(reports);
+			data.setType("employee");
+		}
+		return data;
+	}
 
+	private double calculateTotalRating(HashMap<Integer, Weightage> weightages) {
+		int total = 0;
+		for (Weightage weightage : weightages.values()) {
+			total += weightage.getWeightage();
+		}
+		return weightages.size()*total;
+	}
 }

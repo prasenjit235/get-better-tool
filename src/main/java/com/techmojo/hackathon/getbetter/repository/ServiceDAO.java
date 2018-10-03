@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,20 +15,22 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import com.techmojo.hackathon.getbetter.model.ApplicationUser;
 import com.techmojo.hackathon.getbetter.model.Appraisal;
 import com.techmojo.hackathon.getbetter.model.AppraisalDetail;
 import com.techmojo.hackathon.getbetter.model.Category;
+import com.techmojo.hackathon.getbetter.model.IndividualReport;
 import com.techmojo.hackathon.getbetter.model.Parameter;
+import com.techmojo.hackathon.getbetter.model.Weightage;
 
 @Repository
 public class ServiceDAO {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
 	public List<Category> getCategories() {
-		List<Category> details = jdbcTemplate.query(getQueries("GET_CATEGORIES"), 
-				new Object[] {}, 
+		List<Category> details = jdbcTemplate.query(getQueries("GET_CATEGORIES"), new Object[] {},
 				new CategoryMapper());
 		if (details == null || details.isEmpty()) {
 			return null;
@@ -37,10 +40,9 @@ public class ServiceDAO {
 		}
 		return details;
 	}
-	
+
 	public Category getCategory(int category) {
-		List<Category> details = jdbcTemplate.query(getQueries("GET_CATEGORY_BY_ID"), 
-				new Object[] {category}, 
+		List<Category> details = jdbcTemplate.query(getQueries("GET_CATEGORY_BY_ID"), new Object[] { category },
 				new CategoryMapper());
 		if (details == null || details.isEmpty()) {
 			return null;
@@ -48,288 +50,161 @@ public class ServiceDAO {
 		details.get(0).setParameters(getParameters(category));
 		return details.get(0);
 	}
-	
+
 	public List<Parameter> getParameters(int category) {
-		ParameterMapper mapper= new ParameterMapper();
-		jdbcTemplate.query(getQueries("GET_PARAMETERS_BY_CAT_ID"), 
-				new Object[] {category}, 
-				mapper);
+		ParameterMapper mapper = new ParameterMapper();
+		jdbcTemplate.query(getQueries("GET_PARAMETERS_BY_CAT_ID"), new Object[] { category }, mapper);
 		List<Parameter> details = mapper.getParameters();
 		if (details == null || details.isEmpty()) {
 			return null;
 		}
-		
+
 		return details;
 	}
-	
+
 	public Parameter getParameter(int category, int parameter) {
-		ParameterMapper mapper= new ParameterMapper();
-		jdbcTemplate.query(getQueries("GET_PARAMETERS_BY_PARAM_ID"), 
-				new Object[] {parameter}, 
-				mapper);
+		ParameterMapper mapper = new ParameterMapper();
+		jdbcTemplate.query(getQueries("GET_PARAMETERS_BY_PARAM_ID"), new Object[] { parameter }, mapper);
 		List<Parameter> details = mapper.getParameters();
 		if (details == null || details.isEmpty()) {
 			return null;
 		}
-		
+
 		return details.get(0);
 	}
-	
+
 	private String getQueries(String queryName) {
 		String query = "";
 		switch (queryName) {
-			case "GET_CATEGORIES":
-				query = "select "
-						+ " iCategoryID,"
-						+ " cCategoryName,"
-						+ " dtCreatedOn,"
-						+ " dtUpdatedOn,"
-						+ " iStatus"
+		case "GET_CATEGORIES":
+			query = "select " + " iCategoryID," + " cCategoryName," + " dtCreatedOn," + " dtUpdatedOn," + " iStatus"
 					+ " from tbl_Categories";
-				break;
-			case "GET_CATEGORY_BY_ID":
-				query = "select "
-						+ " iCategoryID,"
-						+ " cCategoryName,"
-						+ " dtCreatedOn,"
-						+ " dtUpdatedOn,"
-						+ " iStatus"
-					+ " from tbl_Categories"
-					+ " where  iCategoryID = ?";
-				break;
-			case "INSERT_PARAMETER":
-				query = "insert "
-					+ " into tbl_Parameters ("
-						+ " iCategoryID,"
-						+ " cParameterName,"
-						+ " iStatus)"
+			break;
+		case "GET_CATEGORY_BY_ID":
+			query = "select " + " iCategoryID," + " cCategoryName," + " dtCreatedOn," + " dtUpdatedOn," + " iStatus"
+					+ " from tbl_Categories" + " where  iCategoryID = ?";
+			break;
+		case "INSERT_PARAMETER":
+			query = "insert " + " into tbl_Parameters (" + " iCategoryID," + " cParameterName," + " iStatus)"
 					+ " values(?,?,?)";
-				break;
-			case "INSERT_WEIGHTAGE":
-				query = "insert "
-					+ " into tbl_Weigtages ("
-						+ " iParameterID,"
-						+ " iDesignationID,"
-						+ " iScore,"
-						+ " iStatus)"
-					+ " values(?,?,?,?)";
-				break;
-			case "UPDATE_PARAMETER":
-				query = "update "
-					+ " tbl_Parameters set"
-						+ " cParameterName = ?,"
-						+ " iStatus = ?"
+			break;
+		case "INSERT_WEIGHTAGE":
+			query = "insert " + " into tbl_Weigtages (" + " iParameterID," + " iDesignationID," + " iScore,"
+					+ " iStatus)" + " values(?,?,?,?)";
+			break;
+		case "UPDATE_PARAMETER":
+			query = "update " + " tbl_Parameters set" + " cParameterName = ?," + " iStatus = ?"
 					+ " where iParameterID = ?";
-				break;
-			case "UPDATE_WEIGHTAGE":
-				query = "update "
-						+ " tbl_Weigtages set"
-							+ " iScore = ?,"
-							+ " iStatus = ?"
-						+ " where iWeightageID = ?";
-				break;
-			case "GET_PARAMETERS_BY_CAT_ID":
-				query = "select "
-						+ " p.iParameterID,"
-						+ " p.cParameterName,"
-						+ " p.dtCreatedOn as p_createdDate,"
-						+ " p.iStatus as p_status,"
-						+ " p.iCategoryID,"
-						+ " w.iWeightageID,"
-						+ " w.iDesignationID,"
-						+ " w.iScore,"
-						+ " w.dtCreatedOn as w_createdDate,"
-						+ " w.iStatus as w_status "
-					 + " from tbl_Parameters p , tbl_Weigtages w "
-					 + " where "
-					    + " p.iCategoryID = ? "
-					    + " and p.iParameterID = w.iParameterID ";
-				break;
-			case "GET_PARAMETERS_BY_PARAM_ID":
-				query = "select "
-						+ " p.iParameterID,"
-						+ " p.cParameterName,"
-						+ " p.dtCreatedOn as p_createdDate,"
-						+ " p.iStatus as p_status,"
-						+ " p.iCategoryID,"
-						+ " w.iWeightageID,"
-						+ " w.iDesignationID,"
-						+ " w.iScore,"
-						+ " w.dtCreatedOn as w_createdDate,"
-						+ " w.iStatus as w_status "
-					 + " from tbl_Parameters p , tbl_Weigtages w "
-					 + " where "
-					    + " p.iParameterID = ? "
-					    + " and p.iParameterID = w.iParameterID ";
-				break;
-			case "DELETE_WIEGHTAGES_BY_PARAM_ID":
-				query = "delete "
-					 + " from tbl_Weigtages "
-					 + " where "
-					    + " iParameterID = ? ";
-				break;
-			case "DELETE_PARAMETER_BY_PARAM_ID":
-				query = "delete "
-					 + " from tbl_Parameters "
-					 + " where "
-					    + " iParameterID = ? ";
-				break;
-			case "INSERT_CONVERSATION":
-				query = "insert "
-					+ "  into tbl_Conversations("
-								+ " iConversationID,"
-								+ " tConversation,"
-								+ " iCreatedBy) "
-								+ " values(?,?,?)";
-				break;
-			case "INSERT_APPRAISAL":
-				query = "insert "
-					+ "  into tbl_Appraisals("
-								+ " iFrom,"
-								+ " iTo,"
-								+ " iConversationID,"
-								+ " iStatus,"
-								+ " iYear,"
-								+ " iMonth) "
-								+ " values(?,?,?,?,?,?)";
-				break;
-			case "INSERT_APPRAISAL_DETAILS":
-				query = "insert "
-					+ "  into tbl_Appraisal_Details("
-								+ " iAppraisalID,"
-								+ " iWeigtageID,"
-								+ " iScore,"
-								+ " iConversationID)"
-								+ " values(?,?,?,?)";
-				break;
-			case "UPDATE_APPRAISAL":
-				query = "update "
-					+ "        tbl_Appraisals"
-					 + "    set  "
-					 		   + " iConversationID = ?,"
-					 		   + " iStatus = ?"
-					 + "    where "
-					 		   + " iAppraisalID = ?";
-				break;
-			case "UPDATE_APPRAISAL_DETAILS":
-				query = "update "
-					+ "        tbl_Appraisal_Details"
-					 + "    set  "
-					 		   + " iConversationID = ?,"
-					 		   + " iScore = ?"
-					 + "    where "
-					 		   + " iAppraisalID = ?"
-					 		   + " and iWeigtageID = ?";
-				break;
-			case "GET_APPRAISAL":
-				query = "select "
-						+ " a.iFrom,"
-						+ " a.iTo,"
-						+ " a.iConversationID,"
-						+ " a.dtCreatedOn,"
-						+ " a.iAppraisalID,"
-						+ " a.iStatus,"
-						+ " a.iYear,"
-						+ " a.iMonth,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisals a left join tbl_Conversations c "
-					 + " on a.iConversationID = c.iConversationID "
-					 + "where "
-					 + " a.iAppraisalID = ?";
-				break;
-			case "GET_APPRAISAL_DTLS":
-				query = "select "
-						+ " d.iWeigtageID,"
-						+ " d.iScore,"
-						+ " d.iConversationID,"
-						+ " d.dtCreatedOn,"
-						+ " w.iParameterID,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisal_Details d inner join tbl_Weigtages w "
-					 + " on w.iWeightageID = d.iWeigtageID left join tbl_Conversations c "
-					 + " on d.iConversationID = c.iConversationID "
-					 + "where d.iAppraisalID = ?";
-				break;
-			case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL":
-				query = "select "
-						+ " a.iFrom,"
-						+ " a.iTo,"
-						+ " a.iConversationID,"
-						+ " a.dtCreatedOn,"
-						+ " a.iAppraisalID,"
-						+ " a.iStatus,"
-						+ " a.iYear,"
-						+ " a.iMonth,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisals a left join tbl_Conversations c "
-					 + " on a.iConversationID = c.iConversationID "
-					 + "where "
-					 + " a.iTo = ?"
-					 + " and a.iYear = ?";
-				break;
-			case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH":
-				query = "select "
-						+ " a.iFrom,"
-						+ " a.iTo,"
-						+ " a.iConversationID,"
-						+ " a.dtCreatedOn,"
-						+ " a.iAppraisalID,"
-						+ " a.iStatus,"
-						+ " a.iYear,"
-						+ " a.iMonth,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisals a left join tbl_Conversations c "
-					 + " on a.iConversationID = c.iConversationID "
-					 + "where "
-					 + " a.iTo = ?"
-					 + " and a.iYear = ?"
-					 + " and a.iMonth = ?";
-				break;
-			case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH":
-				query = "select "
-						+ " a.iFrom,"
-						+ " a.iTo,"
-						+ " a.iConversationID,"
-						+ " a.dtCreatedOn,"
-						+ " a.iAppraisalID,"
-						+ " a.iStatus,"
-						+ " a.iYear,"
-						+ " a.iMonth,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisals a left join tbl_Conversations c "
-					 + " on a.iConversationID = c.iConversationID "
-					 + "where "
-					 + " a.iFrom = ?"
-					 + " and a.iYear = ?"
-					 + " and a.iMonth = ?";
-				break;
-			case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL":
-				query = "select "
-						+ " a.iFrom,"
-						+ " a.iTo,"
-						+ " a.iConversationID,"
-						+ " a.dtCreatedOn,"
-						+ " a.iAppraisalID,"
-						+ " a.iStatus,"
-						+ " a.iYear,"
-						+ " a.iMonth,"
-						+ " c.tConversation,"
-						+ " c.iCreatedBy "
-					 + "from tbl_Appraisals a left join tbl_Conversations c "
-					 + " on a.iConversationID = c.iConversationID "
-					 + "where "
-					 + " a.iFrom = ?"
-					 + " and a.iYear = ?";
-				break;
-			default:
-				break;
+			break;
+		case "UPDATE_WEIGHTAGE":
+			query = "update " + " tbl_Weigtages set" + " iScore = ?," + " iStatus = ?" + " where iWeightageID = ?";
+			break;
+		case "GET_PARAMETERS_BY_CAT_ID":
+			query = "select " + " p.iParameterID," + " p.cParameterName," + " p.dtCreatedOn as p_createdDate,"
+					+ " p.iStatus as p_status," + " p.iCategoryID," + " w.iWeightageID," + " w.iDesignationID,"
+					+ " w.iScore," + " w.dtCreatedOn as w_createdDate," + " w.iStatus as w_status "
+					+ " from tbl_Parameters p , tbl_Weigtages w " + " where " + " p.iCategoryID = ? "
+					+ " and p.iParameterID = w.iParameterID ";
+			break;
+		case "GET_PARAMETERS_BY_PARAM_ID":
+			query = "select " + " p.iParameterID," + " p.cParameterName," + " p.dtCreatedOn as p_createdDate,"
+					+ " p.iStatus as p_status," + " p.iCategoryID," + " w.iWeightageID," + " w.iDesignationID,"
+					+ " w.iScore," + " w.dtCreatedOn as w_createdDate," + " w.iStatus as w_status "
+					+ " from tbl_Parameters p , tbl_Weigtages w " + " where " + " p.iParameterID = ? "
+					+ " and p.iParameterID = w.iParameterID ";
+			break;
+		case "DELETE_WIEGHTAGES_BY_PARAM_ID":
+			query = "delete " + " from tbl_Weigtages " + " where " + " iParameterID = ? ";
+			break;
+		case "DELETE_PARAMETER_BY_PARAM_ID":
+			query = "delete " + " from tbl_Parameters " + " where " + " iParameterID = ? ";
+			break;
+		case "INSERT_CONVERSATION":
+			query = "insert " + "  into tbl_Conversations(" + " iConversationID," + " tConversation," + " iCreatedBy) "
+					+ " values(?,?,?)";
+			break;
+		case "INSERT_APPRAISAL":
+			query = "insert " + "  into tbl_Appraisals(" + " iFrom," + " iTo," + " iConversationID," + " iStatus,"
+					+ " iYear," + " iMonth) " + " values(?,?,?,?,?,?)";
+			break;
+		case "INSERT_APPRAISAL_DETAILS":
+			query = "insert " + "  into tbl_Appraisal_Details(" + " iAppraisalID," + " iWeigtageID," + " iScore,"
+					+ " iConversationID)" + " values(?,?,?,?)";
+			break;
+		case "UPDATE_APPRAISAL":
+			query = "update " + "        tbl_Appraisals" + "    set  " + " iConversationID = ?," + " iStatus = ?"
+					+ "    where " + " iAppraisalID = ?";
+			break;
+		case "UPDATE_APPRAISAL_DETAILS":
+			query = "update " + "        tbl_Appraisal_Details" + "    set  " + " iConversationID = ?," + " iScore = ?"
+					+ "    where " + " iAppraisalID = ?" + " and iWeigtageID = ?";
+			break;
+		case "GET_APPRAISAL":
+			query = "select " + " a.iFrom," + " a.iTo," + " a.iConversationID," + " a.dtCreatedOn," + " a.iAppraisalID,"
+					+ " a.iStatus," + " a.iYear," + " a.iMonth," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisals a left join tbl_Conversations c "
+					+ " on a.iConversationID = c.iConversationID " + "where " + " a.iAppraisalID = ?";
+			break;
+		case "GET_APPRAISAL_DTLS":
+			query = "select " + " d.iWeigtageID," + " d.iScore," + " d.iConversationID," + " d.dtCreatedOn,"
+					+ " w.iParameterID," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisal_Details d inner join tbl_Weigtages w "
+					+ " on w.iWeightageID = d.iWeigtageID left join tbl_Conversations c "
+					+ " on d.iConversationID = c.iConversationID " + "where d.iAppraisalID = ?";
+			break;
+		case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL":
+			query = "select " + " a.iFrom," + " a.iTo," + " a.iConversationID," + " a.dtCreatedOn," + " a.iAppraisalID,"
+					+ " a.iStatus," + " a.iYear," + " a.iMonth," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisals a left join tbl_Conversations c "
+					+ " on a.iConversationID = c.iConversationID " + "where " + " a.iTo = ?" + " and a.iYear = ?";
+			break;
+		case "GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH":
+			query = "select " + " a.iFrom," + " a.iTo," + " a.iConversationID," + " a.dtCreatedOn," + " a.iAppraisalID,"
+					+ " a.iStatus," + " a.iYear," + " a.iMonth," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisals a left join tbl_Conversations c "
+					+ " on a.iConversationID = c.iConversationID " + "where " + " a.iTo = ?" + " and a.iYear = ?"
+					+ " and a.iMonth = ?";
+			break;
+		case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH":
+			query = "select " + " a.iFrom," + " a.iTo," + " a.iConversationID," + " a.dtCreatedOn," + " a.iAppraisalID,"
+					+ " a.iStatus," + " a.iYear," + " a.iMonth," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisals a left join tbl_Conversations c "
+					+ " on a.iConversationID = c.iConversationID " + "where " + " a.iFrom = ?" + " and a.iYear = ?"
+					+ " and a.iMonth = ?";
+			break;
+		case "GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL":
+			query = "select " + " a.iFrom," + " a.iTo," + " a.iConversationID," + " a.dtCreatedOn," + " a.iAppraisalID,"
+					+ " a.iStatus," + " a.iYear," + " a.iMonth," + " c.tConversation," + " c.iCreatedBy "
+					+ "from tbl_Appraisals a left join tbl_Conversations c "
+					+ " on a.iConversationID = c.iConversationID " + "where " + " a.iFrom = ?" + " and a.iYear = ?";
+			break;
+		case "GET_INDIVIDUAL_APPRAISAL_RATING_FIN_YEAR_MONTH_ALL":
+			query = "select " + " e.cEmpName," + " (select cEmpName from tbl_Employee where iEmpID=e.iRMID) as manager,"
+					+ " d.iAppraisalID," + " a.iWeigtageID," + " d.iFrom," + " d.iTo," + " d.iYear," + " d.iMonth,"
+					+ " d.iStatus," + " a.iScore " + "from tbl_Appraisals d ," + " tbl_Appraisal_Details a, "
+					+ " tbl_Employee e " + "where d.iTo = ? " + " and iYear= ?  "
+					+ " and a.iAppraisalID=d.iAppraisalID " + " and d.iFrom = e.iRMID " + " and d.iTo=e.iEmpID;";
+			break;
+		case "GET_INDIVIDUAL_APPRAISAL_RATING_FIN_YEAR_MONTH":
+			query = "select " + " e.cEmpName," + " (select cEmpName from tbl_Employee where iEmpID=e.iRMID) as manager,"
+					+ " d.iAppraisalID," + " a.iWeigtageID," + " d.iFrom," + " d.iTo," + " d.iYear," + " d.iMonth,"
+					+ " d.iStatus," + " a.iScore " + "from tbl_Appraisals d ," + " tbl_Appraisal_Details a, "
+					+ " tbl_Employee e " + "where d.iTo = ? " + " and iYear = ?  " + " and iMonth = ? "
+					+ " and a.iAppraisalID=d.iAppraisalID " + " and d.iFrom = e.iRMID " + " and d.iTo=e.iEmpID;";
+			break;
+		case "GET_INDIVIDUAL_WEIGHTAGES":
+			query = "select " + " w.iWeightageID," + " w.iScore," + " w.iDesignationID," + " w.iStatus " + " from "
+					+ " tbl_Weigtages w, " + " tbl_Designations d, " + " tbl_Employee e " + " where "
+					+ " e.iEmpID = ? and " + " e.iDesignationID = d.iDesignationID and "
+					+ " w.iDesignationID = d.iDesignationID";
+			break;
+		case "GET_USER_BY_USERNAME":
+			query = "select iEmpID , cPassword from tbl_Employee_Token where iEmpId = ?";
+			break;
+		default:
+			break;
 		}
-		
+
 		return query;
 	}
 
@@ -338,7 +213,8 @@ public class ServiceDAO {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_PARAMETER"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_PARAMETER"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setInt(1, categoryId);
 				ps.setString(2, parameterName);
 				ps.setInt(3, status);
@@ -354,7 +230,8 @@ public class ServiceDAO {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_WEIGHTAGE"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_WEIGHTAGE"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setInt(1, parameterId);
 				ps.setInt(2, designationId);
 				ps.setInt(3, weightage);
@@ -370,14 +247,15 @@ public class ServiceDAO {
 		int count = jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("UPDATE_PARAMETER"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("UPDATE_PARAMETER"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, parameterName);
 				ps.setInt(2, status);
 				ps.setInt(3, parameterId);
 				return ps;
 			}
 		});
-		
+
 		return count;
 	}
 
@@ -385,14 +263,15 @@ public class ServiceDAO {
 		int count = jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("UPDATE_WEIGHTAGE"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("UPDATE_WEIGHTAGE"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setInt(1, weightage);
 				ps.setInt(2, status);
 				ps.setInt(3, weightageId);
 				return ps;
 			}
 		});
-		
+
 		return count;
 	}
 
@@ -405,7 +284,7 @@ public class ServiceDAO {
 				return ps;
 			}
 		});
-		
+
 		return count;
 	}
 
@@ -418,7 +297,7 @@ public class ServiceDAO {
 				return ps;
 			}
 		});
-		
+
 		return count;
 	}
 
@@ -427,7 +306,8 @@ public class ServiceDAO {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_APPRAISAL"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_APPRAISAL"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setInt(1, from);
 				ps.setInt(2, to);
 				ps.setString(3, conversationId);
@@ -444,7 +324,8 @@ public class ServiceDAO {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_APPRAISAL_DETAILS"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_APPRAISAL_DETAILS"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setInt(1, appraisalId);
 				ps.setInt(2, weightageId);
 				ps.setInt(3, score);
@@ -458,7 +339,8 @@ public class ServiceDAO {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_CONVERSATION"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement ps = connection.prepareStatement(getQueries("INSERT_CONVERSATION"),
+						Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, conversationId);
 				ps.setString(2, conversation);
 				ps.setInt(3, createdBy);
@@ -497,18 +379,14 @@ public class ServiceDAO {
 	}
 
 	public Appraisal getAppraisal(int appraisalId) {
-		AppraisalMapper mapper= new AppraisalMapper();
-		jdbcTemplate.query(getQueries("GET_APPRAISAL"), 
-				new Object[] {appraisalId}, 
-				mapper);
+		AppraisalMapper mapper = new AppraisalMapper();
+		jdbcTemplate.query(getQueries("GET_APPRAISAL"), new Object[] { appraisalId }, mapper);
 		Appraisal appraisal = mapper.getAppraisal(appraisalId);
 		if (appraisal == null) {
 			return null;
 		}
-		AppraisalDetailsMapper dtlsmapper= new AppraisalDetailsMapper();
-		jdbcTemplate.query(getQueries("GET_APPRAISAL_DTLS"), 
-				new Object[] {appraisalId}, 
-				dtlsmapper);
+		AppraisalDetailsMapper dtlsmapper = new AppraisalDetailsMapper();
+		jdbcTemplate.query(getQueries("GET_APPRAISAL_DTLS"), new Object[] { appraisalId }, dtlsmapper);
 		List<AppraisalDetail> appraisals = dtlsmapper.getAppraisalDetails();
 		for (AppraisalDetail appraisalDetail : appraisals) {
 			appraisalDetail.setParameter(getParameter(0, appraisalDetail.getParameter().getParameterId()));
@@ -518,37 +396,32 @@ public class ServiceDAO {
 	}
 
 	public ArrayList<Appraisal> getAppraisalForEmployee(int employeeId, int year, int month, boolean fromEmpl) {
-		AppraisalMapper mapper= new AppraisalMapper();
+		AppraisalMapper mapper = new AppraisalMapper();
 		if (fromEmpl) {
 			if (month > 0) {
-				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH"), 
-						new Object[] {employeeId, year, month}, 
-						mapper);
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH"),
+						new Object[] { employeeId, year, month }, mapper);
 			} else {
-				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL"), 
-						new Object[] {employeeId, year}, 
-						mapper);
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_EMPLOYEE_FIN_YEAR_MONTH_ALL"),
+						new Object[] { employeeId, year }, mapper);
 			}
 		} else {
 			if (month > 0) {
-				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH"), 
-						new Object[] {employeeId, year, month}, 
-						mapper);
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH"),
+						new Object[] { employeeId, year, month }, mapper);
 			} else {
-				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL"), 
-						new Object[] {employeeId, year}, 
-						mapper);
+				jdbcTemplate.query(getQueries("GET_APPRAISAL_FOR_REPORTEES_FIN_YEAR_MONTH_ALL"),
+						new Object[] { employeeId, year }, mapper);
 			}
 		}
-		
+
 		ArrayList<Appraisal> appraisals = mapper.getAppraisals();
 		if (appraisals == null) {
 			return null;
 		}
 		for (Appraisal appraisal : appraisals) {
-			AppraisalDetailsMapper dtlsmapper= new AppraisalDetailsMapper();
-			jdbcTemplate.query(getQueries("GET_APPRAISAL_DTLS"), 
-					new Object[] {appraisal.getAppraisalId()}, 
+			AppraisalDetailsMapper dtlsmapper = new AppraisalDetailsMapper();
+			jdbcTemplate.query(getQueries("GET_APPRAISAL_DTLS"), new Object[] { appraisal.getAppraisalId() },
 					dtlsmapper);
 			List<AppraisalDetail> appraisalDtls = dtlsmapper.getAppraisalDetails();
 			for (AppraisalDetail appraisalDetail : appraisalDtls) {
@@ -557,5 +430,37 @@ public class ServiceDAO {
 			appraisal.setAppraisalDetails(appraisalDtls);
 		}
 		return appraisals;
+	}
+
+	public List<IndividualReport> getIndividualRatings(int employeeId, int year, int month) {
+
+		List<IndividualReport> individualReports = null;
+		if (month > 0) {
+			individualReports = jdbcTemplate.query(getQueries("GET_INDIVIDUAL_APPRAISAL_RATING_FIN_YEAR_MONTH"),
+					new Object[] { employeeId, year, month }, new IndividualRatingsMapper());
+		} else {
+			individualReports = jdbcTemplate.query(getQueries("GET_INDIVIDUAL_APPRAISAL_RATING_FIN_YEAR_MONTH_ALL"),
+					new Object[] { employeeId, year }, new IndividualRatingsMapper());
+		}
+
+		return individualReports;
+	}
+
+	public HashMap<Integer, Weightage> getWeightagesForIndividual(int employeeId) {
+		IndividualWeightageMapper individualWeightageMapper = new IndividualWeightageMapper();
+		jdbcTemplate.query(getQueries("GET_INDIVIDUAL_WEIGHTAGES"), new Object[] { employeeId },
+				individualWeightageMapper);
+
+		return individualWeightageMapper.getWeightageMap();
+	}
+
+	public ApplicationUser findByUsername(String username) {
+		List<ApplicationUser> users = null;
+		users = jdbcTemplate.query(getQueries("GET_USER_BY_USERNAME"),
+				new Object[] { Integer.parseInt(username) }, new ApplicationUserMapper());
+		if (users == null || users.isEmpty()) {
+			return null;
+		}
+		return users.get(0);
 	}
 }

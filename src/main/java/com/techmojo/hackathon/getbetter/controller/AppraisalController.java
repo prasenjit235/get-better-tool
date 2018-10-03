@@ -89,8 +89,8 @@ public class AppraisalController {
 		HttpStatus status = HttpStatus.OK;
 		try {
 			appraisals = service.getAppraisalForEmployee(employeeId, year, month);
-			if (appraisals == null || appraisals.isEmpty()) {
-				status = HttpStatus.NOT_FOUND;
+			if (appraisals == null) {
+				appraisals =  new ArrayList<>();
 			}
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -106,8 +106,8 @@ public class AppraisalController {
 		HttpStatus status = HttpStatus.OK;
 		try {
 			appraisals = service.getAppraisalForEmployeeReportees(employeeId, year, month);
-			if (appraisals == null || appraisals.isEmpty()) {
-				status = HttpStatus.NOT_FOUND;
+			if (appraisals == null) {
+				appraisals = new ArrayList<>();
 			}
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -122,9 +122,6 @@ public class AppraisalController {
 		HttpStatus status = HttpStatus.OK;
 		try {
 			appraisal = service.getAppraisal(appraisalId);
-			if (appraisal == null) {
-				status = HttpStatus.NOT_FOUND;
-			}
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			e.printStackTrace();

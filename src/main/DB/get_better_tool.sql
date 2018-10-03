@@ -199,12 +199,18 @@ CREATE TABLE IF NOT EXISTS `tbl_TeamMembers` (
   PRIMARY KEY (`iSlNo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `tbl_Employee_Token` (
+ `iEmpID` int(11) NOT NULL,
+ `cPassword` char(100) NOT NULL,
+ `cToken` char(100),
+ FOREIGN KEY (`iEmpID`) REFERENCES tbl_Employee(iEmpID)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 insert into tbl_Designations(iDesignationID, cDesignation) values(1, 'Software Engineer'),(2,'Senior Software Engineer'),(3,'Technical Analyst'),(4,'Technical Lead'),(5,'Project Manager'),(6,'Software Achitect'),(7,'Chief Architect'),(8,'Chief Executive Officer');
 insert into tbl_Employee(iEmpID,cEmpName,cEmpMailId,iDesignationID,dtJoiningDate,iRMID) values(1002,'Ranjith Ayinala','ranjith.ayinala@techmojo.in',8,NOW(),1002),(1003,'Prasenjit Das','prasenjit@techmojo.in',4,NOW(),1002),(1004,'Lokesh Matturti','lokesh.matturti@techmojo.in',2,NOW(),1003),(1005,'Mallikharjun Janapareddi','mj@techmojo.in',3,NOW(),1003),(1006,'Tausief Shaikh','tausief.shaikh@techmojo.in',4,NOW(),1002),(1007,'Chandrakanth Nelge','chandrakanth.nelge@techmojo.in',3,NOW(),1006),(1008,'Harish S','harish.s@techmojo.in',2,NOW(),1006);
 insert into tbl_Team(iTeamID,cTeamName) values(1,'Openbet SportsBet'),(2,'Dalberry'),(3,'ROKA'),(4,'Riverplay');
 insert into tbl_TeamMembers(iTeamID,iEmpID) values(1,1003),(1,1004),(1,1005),(2,1006),(2,1007),(2,1008); 
-
+insert into tbl_Employee_Token(iEmpID,cPassword) values(1002,'$2a$10$wFyOSJqNumfDCREK5SmcMOv9o.87Iagk/8tQ1SxnnXw6YjMBFeuPK'),(1003,'$2a$10$wFyOSJqNumfDCREK5SmcMOv9o.87Iagk/8tQ1SxnnXw6YjMBFeuPK'),(1004,'$2a$10$wFyOSJqNumfDCREK5SmcMOv9o.87Iagk/8tQ1SxnnXw6YjMBFeuPK'),(1005,'$2a$10$wFyOSJqNumfDCREK5SmcMOv9o.87Iagk/8tQ1SxnnXw6YjMBFeuPK'),(1006,'$2a$10$wFyOSJqNumfDCREK5SmcMOv9o.87Iagk/8tQ1SxnnXw6YjMBFeuPK');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
