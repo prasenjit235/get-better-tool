@@ -10,27 +10,28 @@ import { DynamicFormModule } from './dynamic-form/dynamic-form.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { ContentComponent } from './content/content.component';
+import { AppraisalComponent } from './appraisal/appraisal.component';
 import { ParametersComponent } from './parameters/parameters.component';
 
 import { AjaxService } from './services/ajax.service';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    DashboardComponent,
     ForgotPasswordComponent,
     HeaderComponent,
     FooterComponent,
     SideMenuComponent,
     ContentComponent,
-    ParametersComponent
+    ParametersComponent,
+    AppraisalComponent
   ],
   imports: [
     BrowserModule,

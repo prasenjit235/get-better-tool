@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: "http://108.61.185.26:90/backoffice/appraisal/",
+  host: "http://108.61.185.26:90/",
 };
 
 /*
