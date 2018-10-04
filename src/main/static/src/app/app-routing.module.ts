@@ -10,11 +10,11 @@ import { ParametersComponent } from './parameters/parameters.component';
 const routes: Routes = [
   {
       path: '',
-      redirectTo: '/login',
+      redirectTo: '/index',
       pathMatch: 'full'
   },
   {
-      path: 'login',
+      path: 'index',
       component: LoginComponent,
   },
   {

@@ -11,11 +11,11 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password123
 
-  proxy:
+  gbt:
     build:
-      context: ./src/main/nginx/
+      context: ./src/main/
       dockerfile: Dockerfile
-    image: appraisalproxy
+    image: gbt
     ports:
       - '80:80'
     links:

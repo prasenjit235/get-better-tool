@@ -1,6 +1,7 @@
 package com.techmojo.hackathon.getbetter.security;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techmojo.hackathon.getbetter.model.ApplicationUser;
+import com.techmojo.hackathon.getbetter.model.Employee;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -54,5 +56,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET)
                 .compact();
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        PrintWriter out = res.getWriter();
+        Employee employee = new Employee();
+        employee.setEmployeeId(Integer.parseInt(((User) auth.getPrincipal()).getUsername()));
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
+        out.print(mapper.writeValueAsString(employee));
+        out.flush();
     }
 }
