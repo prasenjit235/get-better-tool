@@ -24,7 +24,7 @@ export class AjaxService {
       this.http.post(environment.host+url,params,{headers:headers})
       .toPromise().then(
           data => {
-            if(data['status'] === 201) {
+            if(data['status'] === 200 || data['status'] === 201) {
               let response = JSON.parse(data["_body"]);
               resolve (response);
             }else{

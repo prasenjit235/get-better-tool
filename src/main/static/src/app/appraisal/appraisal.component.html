@@ -1,0 +1,203 @@
+<div class="row">
+  <div class="col-md-12">
+  <!-- SELECT2 EXAMPLE -->
+  <div class="box box-default">
+    <div class="box-header with-border">
+      <h3 class="box-title">Appraisal</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+      <div class="row">
+        <form [formGroup]="searchForm" (submit)="serachAppraisal()">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label>Employee</label>
+              <select formControlName="employee" id="employee" class="form-control select2" style="width: 100%;">
+                <option value=''>Select Employee</option>
+                <option *ngFor="let employee of employees" value="{{employee.id}}">{{employee.name}}</option>
+              </select>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3">
+            <!-- /.form-group -->
+            <div class="form-group">
+              <label>Year</label>
+              <select formControlName="year" id="year" class="form-control select2" style="width: 100%;">
+                <option value=''>Select Year</option>
+                <option *ngFor="let year of years" value="{{year.value}}">{{year.label}}</option>
+              </select>
+            </div>
+            <!-- /.form-group -->
+          </div>
+          <!-- /.col -->
+          <!-- /.col -->
+          <div class="col-md-3">
+            <!-- /.form-group -->
+            <div class="form-group">
+              <label>Month</label>
+              <select formControlName="month" id="month" class="form-control select2" style="width: 100%;">
+                <option value=''>Select Month</option>
+                <option *ngFor="let month of months" value="{{month.value}}">{{month.label}}</option>
+              </select>
+            </div>
+            <!-- /.form-group -->
+          </div>
+          <div class="col-md-3 info-btn">
+            <div class="form-group">
+              <button type="submit" class="btn btn-block btn-info" [disabled]="!searchForm.valid">Search</button>
+            </div>
+          </div>
+          <!-- /.col -->
+        </form>
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.box-body -->
+  </div>
+  <!-- /.box -->
+  </div>
+</div>
+
+<div class="row" *ngIf="searchResults">
+  <!-- /.col -->
+  <div class="col-md-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">List of Appraisals</h3>
+
+        <div class="box-tools">
+          <div class="no-margin pull-right">
+            <button type="button" class="btn btn-block btn-primary" (click)="onNew()">Add +</button>
+          </div>
+        </div>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body no-padding">
+        <table class="table">
+          <tr>
+            <th style="width: 10px">#</th>
+            <th>Task</th>
+            <th>Progress</th>
+            <th style="width: 40px">Label</th>
+          </tr>
+          <tr>
+            <td>1.</td>
+            <td>Update software</td>
+            <td>
+              <div class="progress progress-xs">
+                <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
+              </div>
+            </td>
+            <td><span class="badge bg-red">55%</span></td>
+          </tr>
+          <tr>
+            <td>2.</td>
+            <td>Clean database</td>
+            <td>
+              <div class="progress progress-xs">
+                <div class="progress-bar progress-bar-yellow" style="width: 70%"></div>
+              </div>
+            </td>
+            <td><span class="badge bg-yellow">70%</span></td>
+          </tr>
+          <tr>
+            <td>3.</td>
+            <td>Cron job running</td>
+            <td>
+              <div class="progress progress-xs progress-striped active">
+                <div class="progress-bar progress-bar-primary" style="width: 30%"></div>
+              </div>
+            </td>
+            <td><span class="badge bg-light-blue">30%</span></td>
+          </tr>
+          <tr>
+            <td>4.</td>
+            <td>Fix and squish bugs</td>
+            <td>
+              <div class="progress progress-xs progress-striped active">
+                <div class="progress-bar progress-bar-success" style="width: 90%"></div>
+              </div>
+            </td>
+            <td><span class="badge bg-green">90%</span></td>
+          </tr>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+
+<!-- <div class="row" *ngIf="showNew"> -->
+  <div class="row">
+  <div class="col-md-12">
+    <div class="box box-solid">
+      <div class="box-header with-border">
+        <h3 class="box-title">{{title}}</h3>
+        <button type="button" class="btn btn-default pull-right" (click)="onCancel()">Cancel</button>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <div class="box-group" id="accordion">
+          <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+          <div class="panel box box-success" *ngFor="let category of categories; let i = index">
+            <div class="box-header with-border">
+              <h4 class="box-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapse_{{i}}" (click)='getParameters(i)'>
+                  {{category.name}}
+                </a>
+              </h4>
+            </div>
+            <div id="collapse_{{i}}" class="panel-collapse collapse in">
+              <div class="box-body">
+                <form>
+                  <div class="col-md-12 col-xs-12">
+                    <div class="col-md-3">
+                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                    </div>
+
+                    <div class="col-md-3 form-group">
+                      <input type="number" min="0" placeholder="value" class="form-control"/>
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <textarea class="form-control"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12 col-xs-12">
+                    <div class="col-md-3">
+                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                    </div>
+                    <div class="col-md-3 form-group">
+                      <input type="number" min="0" placeholder="value" class="form-control"/>
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <textarea class="form-control"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12 col-xs-12">
+                    <div class="col-md-3">
+                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                    </div>
+                    <div class="col-md-3 form-group">
+                      <input type="number" min="0" placeholder="value" class="form-control"/>
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <textarea class="form-control"></textarea>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
