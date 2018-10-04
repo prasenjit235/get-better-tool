@@ -29,10 +29,11 @@ export class AppraisalComponent implements OnInit {
   employees = [
     { id : 1058 , name : "Lokesh Matturti" },
     { id : 1002 , name : "Ranjith Ayinala" },
-    { id : 1081 , name : "Prasen" },
-    { id : 1089 , name : "Mallik" },
+    { id : 1081 , name : "Prasenjit Das" },
+    { id : 1089 , name : "Mallikarjun" },
   ];
   searchForm: any;
+  appraisalForm: any;
   showNew: Boolean = false;
   searchResults: Boolean = false;
   title: string = 'Create Appraisal';
@@ -49,27 +50,48 @@ export class AppraisalComponent implements OnInit {
       'year': ['', [Validators.required]],
       'month': ['', [Validators.required]]
     });
+
+    this.appraisalForm = this.formBuilder.group({
+      'ownership': ['', [Validators.required]],
+      'punctuality': ['', [Validators.required]],
+      'collaboration': ['', [Validators.required]],
+      'communication': ['', [Validators.required]],
+      'delivery': ['', [Validators.required]],
+      'quality': ['', [Validators.required]],
+      'mentoring': ['', [Validators.required]],
+      'design': ['', [Validators.required]],
+      'tasks': ['', [Validators.required]],
+      'performance': ['', [Validators.required]],
+      'task_closure': ['', [Validators.required]],
+      'ownership_commnets' : new FormControl(''),
+      'punctuality_commnets' : new FormControl(''),
+      'collaboration_commnets' : new FormControl(''),
+      'communication_commnets' : new FormControl(''),
+      'delivery_commnets' : new FormControl(''),
+      'quality_commnets' : new FormControl(''),
+      'mentoring_commnets' : new FormControl(''),
+      'design_commnets' : new FormControl(''),
+      'tasks_commnets' : new FormControl(''),
+      'performance_commnets' : new FormControl(''),
+      'task_closure_commnets' : new FormControl(''),
+      'feedback': new FormControl('')
+    });
   }
 
   ngOnInit() {
-    this.getCategories();
+    //localStorage.setItem("token","eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMDA0IiwiZXhwIjoxNTM5NTI1NDMyfQ.At_Pp6pARiQyJkpxf3PhA5zw6UJCM6FRsOm2sOu0LTyz1rTEtyAcGLbYppe5pflR1330-MTczPsKnvlfAjexaQ");
   }
 
   getCategories():void {
     this.ajaxService.getCategories()
         .then(data => {
             this.categories = data;
-            for(let cat in this.categories){
-              console.log(cat)
-            }
-            this.getParameters(0);
         });
   }
 
   getParameters(i):void {
     let catId = this.categories[i].id;
     this.parameters = this.categories.filter(category => category.id === catId);
-    console.log(this.parameters)
   }
 
   onNew():void {
@@ -93,6 +115,10 @@ export class AppraisalComponent implements OnInit {
               console.log(data);
           });
     }
+  }
+
+  addAppraisal():void {
+
   }
 
 }

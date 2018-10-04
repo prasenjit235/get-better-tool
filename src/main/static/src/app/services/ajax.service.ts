@@ -20,11 +20,12 @@ export class AjaxService {
 
       let headers = new Headers();
       headers.set('Content-Type','application/json');
+      headers.set('Authorization','Bearer ' + this.getUserAccessToken());
 
       this.http.post(environment.host+url,params,{headers:headers})
       .toPromise().then(
           data => {
-            if(data['status'] === 200 || data['status'] === 201) {
+            if(data['status'] === 201) {
               let response = JSON.parse(data["_body"]);
               resolve (response);
             }else{
@@ -42,6 +43,7 @@ export class AjaxService {
         let self =this;
         let headers = new Headers();
         headers.set('Content-Type','application/json');
+        headers.set('Authorization','Bearer ' + this.getUserAccessToken());
 
         this.http.get(environment.host+url,{search:params,headers:headers})
         .toPromise().then(
@@ -65,6 +67,7 @@ export class AjaxService {
       let loginMessage:string = "";
       let headers = new Headers();
       headers.set('Content-Type','application/json');
+      headers.set('Authorization','Bearer ' + this.getUserAccessToken());
 
       this.http.put(environment.host+url,params,{headers:headers})
       .toPromise().then(
@@ -88,6 +91,7 @@ export class AjaxService {
       let loginMessage:string = "";
       let headers = new Headers();
       headers.set('Content-Type','application/json');
+      headers.set('Authorization','Bearer ' + this.getUserAccessToken());
 
       this.http.delete(environment.host+url,{headers:headers})
       .toPromise().then(
@@ -104,8 +108,33 @@ export class AjaxService {
       });
   }
 
+  doLogin(url,params): Promise<String>{
+    return new Promise((resolve,reject)=>{
+      let self =this;
+
+      let headers = new Headers();
+      headers.set('Content-Type','application/json');
+
+      this.http.post(environment.host+url,params,{headers:headers})
+      .toPromise().then(
+          data => {
+            if(data['status'] === 200) {
+              let headers = data['headers']['_headers'][""[[Entries]]""][4].value;
+              localStorage.setItem("token",headers);
+              let response = JSON.parse(data["_body"]);
+              resolve (response);
+            }else{
+              reject(data);
+            }
+          }
+        ).catch(e =>{
+          console.log(e);
+        });
+      });
+  }
+
   userLogin(data): Promise<String>{
-    return this.doPost('login',data);
+    return this.doLogin('login',data);
   }
 
   getCategories(): Promise<String>{
@@ -127,6 +156,22 @@ export class AjaxService {
   serachAppraisals(empId,data): Promise<String>{
     let queryData = this.getSearchParams(data);
     return this.doGet('appraisals/employees/'+empId,queryData);
+  }
+
+  getUserAccessToken():string{
+    let userToken = localStorage.getItem("token");
+    if(userToken){
+      return userToken;
+    }
+    return "";
+  }
+
+  getEmployeeId():string{
+    let empId = localStorage.getItem("id");
+    if(empId){
+      return empId;
+    }
+    return "";
   }
 
   getSearchParams(searchData){

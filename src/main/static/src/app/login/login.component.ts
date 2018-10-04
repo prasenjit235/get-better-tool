@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormArray, FormControl, ValidatorFn } from '@angular/forms';
+import { Router } from "@angular/router";
 import { AjaxService } from './../services/ajax.service';
 
 @Component({
@@ -14,6 +15,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private ajaxService: AjaxService,
+    private router:Router,
     private formBuilder:FormBuilder
   ) {
     this.loginForm = this.formBuilder.group({
@@ -34,7 +36,8 @@ export class LoginComponent implements OnInit {
 
       this.ajaxService.userLogin(formData)
           .then(data => {
-              console.log(data);
+              localStorage.setItem("id",data.employeeId.toString());
+              this.router.navigate(['/content/appraisal']);
           });
     }
   }

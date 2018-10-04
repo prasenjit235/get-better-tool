@@ -141,58 +141,206 @@
       <!-- /.box-header -->
       <div class="box-body">
         <div class="box-group" id="accordion">
-          <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
-          <div class="panel box box-success" *ngFor="let category of categories; let i = index">
-            <div class="box-header with-border">
-              <h4 class="box-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#collapse_{{i}}" (click)='getParameters(i)'>
-                  {{category.name}}
-                </a>
-              </h4>
-            </div>
-            <div id="collapse_{{i}}" class="panel-collapse collapse in">
-              <div class="box-body">
-                <form>
-                  <div class="col-md-12 col-xs-12">
-                    <div class="col-md-3">
-                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+          <form [formGroup]="appraisalForm" (submit)="addAppraisal()">
+            <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+            <div class="panel box box-success">
+              <div class="box-header with-border">
+                <h4 class="box-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" class="">
+                    Company Level
+                  </a>
+                </h4>
+              </div>
+              <div id="collapseOne" class="panel-collapse collapse in" aria-expanded="true" class="">
+                <div class="box-body">
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="ownership" id="ownership" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="ownership_comments" id="ownership_comments"></textarea>
+                      </div>
                     </div>
 
-                    <div class="col-md-3 form-group">
-                      <input type="number" min="0" placeholder="value" class="form-control"/>
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Punctuality&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="punctuality" id="punctuality" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="punctuality_comments" id="punctuality_comments"></textarea>
+                      </div>
                     </div>
-                    <div class="col-md-6 form-group">
-                      <textarea class="form-control"></textarea>
-                    </div>
-                  </div>
 
-                  <div class="col-md-12 col-xs-12">
-                    <div class="col-md-3">
-                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Collaboration&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="collaboration" id="collaboration" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="collaboration_comments" id="collaboration_comments"></textarea>
+                      </div>
                     </div>
-                    <div class="col-md-3 form-group">
-                      <input type="number" min="0" placeholder="value" class="form-control"/>
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <textarea class="form-control"></textarea>
-                    </div>
-                  </div>
 
-                  <div class="col-md-12 col-xs-12">
-                    <div class="col-md-3">
-                      <p>Ownership&nbsp;<span class="badge bg-green">10</span></p>
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Communication&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="communication" id="communication" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="communication_comments" id="communication_comments"></textarea>
+                      </div>
                     </div>
-                    <div class="col-md-3 form-group">
-                      <input type="number" min="0" placeholder="value" class="form-control"/>
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <textarea class="form-control"></textarea>
-                    </div>
-                  </div>
-                </form>
+                </div>
               </div>
             </div>
-          </div>
+            <div class="panel box box-success">
+              <div class="box-header with-border">
+                <h4 class="box-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" class="collapsed">
+                    Team Level
+                  </a>
+                </h4>
+              </div>
+              <div id="collapseTwo" class="panel-collapse collapse" aria-expanded="false">
+                <div class="box-body">
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Timely delivery&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="delivery" id="delivery" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="delivery_comments" id="delivery_comments"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Getting the right quality of software&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="quality" id="quality" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="quality_comments" id="quality_comments"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Mentoring&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="mentoring" id="mentoring" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="mentoring_comments" id="mentoring_comments"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Design/Analysis&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="design" id="design" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="design_comments" id="design_comments"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Company wide tasks&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="tasks" id="tasks" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="tasks_comments" id="tasks_comments"></textarea>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel box box-success">
+              <div class="box-header with-border">
+                <h4 class="box-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" class="collapsed">
+                    Individual Level
+                  </a>
+                </h4>
+              </div>
+              <div id="collapseThree" class="panel-collapse collapse" aria-expanded="false">
+                <div class="box-body">
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Performance growth & impact on Project&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="performance" id="performance" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="performance_comments" id="performance_comments"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>Independent closure of task&nbsp;<span class="badge bg-green">10</span></p>
+                      </div>
+                      <div class="col-md-3 form-group">
+                        <input type="number" min="0" formControlName="task_closure" id="task_closure" class="form-control"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="task_closure_comments" id="task_closure_comments"></textarea>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel box box-success">
+              <div class="box-header with-border">
+                <h4 class="box-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" class="collapsed">
+                    Submit
+                  </a>
+                </h4>
+              </div>
+              <div id="collapseFour" class="panel-collapse collapse" aria-expanded="false">
+                <div class="box-body">
+                    <div class="col-md-12 col-xs-12">
+                      <div class="col-md-3">
+                        <p>OverAll Feedback</p>
+                      </div>
+
+                      <div class="col-md-6 form-group">
+                        <textarea class="form-control" formControlName="feedback" id="feedback"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-md-3">
+                      <button type="submit" class="btn btn-primary btn-block btn-flat" [disabled]="!appraisalForm.valid">SUBMIT</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
       <!-- /.box-body -->
